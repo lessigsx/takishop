@@ -1,11 +1,6 @@
 import {
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Heading,
-  Flex,
-  Spacer,
   Center,
   Card,
   CardBody,
@@ -13,26 +8,19 @@ import {
   IconButton,
   Button,
   ChakraProvider,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Text,
 } from '@chakra-ui/react';
-import {
-  ArrowBackIcon,
-  ArrowForwardIcon,
-  ChevronDownIcon,
-} from '@chakra-ui/icons';
+import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from 'react';
 import { extendTheme } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import Cookies from 'universal-cookie';
 import takis_fuego from '../images/takis_fuego.png';
 import takis_huakamole from '../images/takis_huakamole.png';
 import takis_original from '../images/takis_original.png';
 import takis_volcano from '../images/takis_volcano.png';
 
-function Home() {
+function Home({ colores, selActual, setSel }) {
   const takis = {
     fuego: (
       <CardBody>
@@ -103,22 +91,22 @@ function Home() {
       </CardBody>
     ),
   };
-  const [selActual, setSel] = useState('original');
   const llavesTakis = Object.keys(takis);
-  const colores = {
-    original: 'green.200',
-    volcano: 'red.200',
-    fuego: 'purple.200',
-    huakamoles: 'gray.200',
-    originalbg: 'green.100',
-    volcanobg: 'red.100',
-    fuegobg: 'purple.100',
-    huakamolesbg: 'gray.100',
-    originalbutton: 'green',
-    volcanobutton: 'red',
-    fuegobutton: 'purple',
-    huakamolesbutton: 'gray',
-  };
+
+  const [user, setUser] = useState(null);
+  const cookies = new Cookies();
+  const userCookie = cookies.get('user');
+
+  useEffect(() => {
+    if (userCookie) {
+      setUser({
+        name: userCookie.name,
+        email: userCookie.email,
+      });
+    } else {
+      setUser(null);
+    }
+  }, [userCookie]);
 
   useEffect(() => {
     const handleLeftArrow = (event) => {
@@ -146,7 +134,7 @@ function Home() {
       window.removeEventListener('keydown', handleLeftArrow);
       window.removeEventListener('keydown', handleRightArrow);
     };
-  }, [llavesTakis]);
+  }, [llavesTakis, setSel]);
 
   const theme = extendTheme({
     styles: {
@@ -161,83 +149,11 @@ function Home() {
   return (
     <ChakraProvider theme={theme}>
       <Box>
-        <Flex p="3">
-          <Box
-            borderBottomRadius="sm"
-            borderBottom="4px"
-            borderColor="yellow.50"
-          >
-            <Heading color="blackAlpha.900" size="md" mt="2">
-              Takishop - tienda virtual
-            </Heading>
-          </Box>
-          <Spacer />
-          <Box
-            borderBottomRadius="sm"
-            borderBottom="4px"
-            borderColor="yellow.50"
-            paddingBottom="2px"
-          >
-            <Breadcrumb variant="unstyled">
-              <BreadcrumbItem pl="1" isCurrentPage>
-                <BreadcrumbLink>
-                  <Button
-                    pl="2"
-                    pr="2"
-                    pt="0"
-                    pb="0"
-                    m="0"
-                    backgroundColor="transparent"
-                      _hover={{
-                        bg: colores[selActual],
-                      }}
-                      _active={{
-                        bg: colores[selActual],
-                      }}
-                  >
-                    <Link to="/">Inicio</Link>
-                  </Button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbItem>
-                <BreadcrumbLink>
-                  <Menu>
-                    <MenuButton
-                      pl="1"
-                      pr="1"
-                      pt="0"
-                      pb="0"
-                      m="0"
-                      backgroundColor="transparent"
-                      as={Button}
-                      rightIcon={<ChevronDownIcon />}
-                      _hover={{
-                        bg: colores[selActual],
-                      }}
-                      _active={{
-                        bg: colores[selActual],
-                      }}
-                    >
-                      Cuenta
-                    </MenuButton>
-                    <MenuList m="0" p="1">
-                      <MenuItem>
-                        <Link to="/register" style={{ minWidth: '100%' }}>
-                          Registrarse
-                        </Link>
-                      </MenuItem>
-                      <MenuItem>
-                        <Link to="/login" style={{ minWidth: '100%' }}>
-                          Iniciar sesión
-                        </Link>
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </Breadcrumb>
-          </Box>
-        </Flex>
+        {user ? (
+          <Navbar colores={colores} selActual={selActual} user={user} />
+        ) : (
+          <Navbar colores={colores} selActual={selActual} />
+        )}
         <Center m={4}>
           <Heading size="lg">Elige tu tipo</Heading>
         </Center>
@@ -260,7 +176,7 @@ function Home() {
                 color="blackAlpha.800"
                 size="sm"
                 onClick={() => {
-                  alert('Aqui le das a /buy o algo asi no se luego inventas');
+                  // /buy/{product-name} client-side
                 }}
               >
                 <svg
@@ -271,8 +187,8 @@ function Home() {
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M5.79166 2H1V4H4.2184L6.9872 16.6776H7V17H20V16.7519L22.1932 7.09095L22.5308 6H6.6552L6.08485 3.38852L5.79166 2ZM19.9869 8H7.092L8.62081 15H18.3978L19.9869 8Z"
                     fill="currentColor"
                   />
