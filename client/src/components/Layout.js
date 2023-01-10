@@ -5,6 +5,8 @@ import { extendTheme } from '@chakra-ui/react';
 import Home from '../pages/Home';
 import Register from '../pages/Register';
 import Login from '../pages/Login';
+import Buy from "../pages/Buy"
+import Log from "../pages/Log"
 
 function Layout() {
   const colores = {
@@ -47,6 +49,14 @@ function Layout() {
       <Route
         path="/login"
         element={<Login colores={colores} selActual={selActual} theme={theme} />}
+      />
+      <Route
+        path="/buy"
+        element={<Buy colores={colores} selActual={selActual} theme={theme} />}
+      />
+      <Route
+        path="/log"
+        element={<Log colores={colores} selActual={selActual} theme={theme} />}
       />
     </Routes>
   );

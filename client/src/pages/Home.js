@@ -9,24 +9,30 @@ import {
   Button,
   ChakraProvider,
   Text,
+  Alert,
+  AlertTitle,
+  AlertIcon,
+  Flex,
 } from '@chakra-ui/react';
 import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from 'react';
 import { extendTheme } from '@chakra-ui/react';
 import Navbar from '../components/Navbar';
-import Cookies from 'universal-cookie';
 import takis_fuego from '../images/takis_fuego.png';
 import takis_huakamole from '../images/takis_huakamole.png';
 import takis_original from '../images/takis_original.png';
 import takis_volcano from '../images/takis_volcano.png';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 function Home({ colores, selActual, setSel }) {
+  const cookies = new Cookies();
   const takis = {
     fuego: (
       <CardBody>
         <Center>
           <Image
-            boxSize="80%"
+            boxSize={{ base: 'xs', md: 'sm' }}
             src={takis_fuego}
             alt="Takis Fuego"
             borderRadius="lg"
@@ -43,7 +49,7 @@ function Home({ colores, selActual, setSel }) {
       <CardBody>
         <Center>
           <Image
-            boxSize="80%"
+            boxSize={{ base: 'xs', md: 'sm' }}
             src={takis_original}
             alt="Takis Original"
             borderRadius="lg"
@@ -60,7 +66,7 @@ function Home({ colores, selActual, setSel }) {
       <CardBody>
         <Center>
           <Image
-            boxSize="80%"
+            boxSize={{ base: 'xs', md: 'sm' }}
             src={takis_volcano}
             alt="Takis Volcano"
             borderRadius="lg"
@@ -77,7 +83,7 @@ function Home({ colores, selActual, setSel }) {
       <CardBody>
         <Center>
           <Image
-            boxSize="80%"
+            boxSize={{ base: 'xs', md: 'sm' }}
             src={takis_huakamole}
             alt="Takis Huakamoles"
             borderRadius="lg"
@@ -92,21 +98,8 @@ function Home({ colores, selActual, setSel }) {
     ),
   };
   const llavesTakis = Object.keys(takis);
-
-  const [user, setUser] = useState(null);
-  const cookies = new Cookies();
-  const userCookie = cookies.get('user');
-
-  useEffect(() => {
-    if (userCookie) {
-      setUser({
-        name: userCookie.name,
-        email: userCookie.email,
-      });
-    } else {
-      setUser(null);
-    }
-  }, [userCookie]);
+  const [notLogged, setNotLoggedAlert] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleLeftArrow = (event) => {
@@ -149,15 +142,37 @@ function Home({ colores, selActual, setSel }) {
   return (
     <ChakraProvider theme={theme}>
       <Box>
-        {user ? (
-          <Navbar colores={colores} selActual={selActual} user={user} />
-        ) : (
-          <Navbar colores={colores} selActual={selActual} />
-        )}
+        <Navbar colores={colores} selActual={selActual} />
+        {notLogged ? (
+          <Center>
+            <Box
+              position="fixed"
+              style={{
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: '1',
+              }}
+            >
+              <Alert status="warning" borderRadius="md">
+                <Box p="2">
+                  <Center>
+                    <AlertIcon />
+                    <AlertTitle>Debes iniciar sesión para comprar</AlertTitle>
+                  </Center>
+                </Box>
+              </Alert>
+            </Box>
+          </Center>
+        ) : null}
         <Center m={4}>
           <Heading size="lg">Elige tu tipo</Heading>
         </Center>
-        <Center>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          flexDirection={{ base: 'column', md: 'row' }}
+        >
           <Box maxW="xs">
             <Card maxW="sm">
               {llavesTakis.indexOf(selActual) === 0
@@ -176,7 +191,14 @@ function Home({ colores, selActual, setSel }) {
                 color="blackAlpha.800"
                 size="sm"
                 onClick={() => {
-                  // /buy/{product-name} client-side
+                  if (cookies.get('user')) {
+                    navigate('/buy', { replace: true });
+                  } else {
+                    setNotLoggedAlert(true);
+                    setTimeout(() => {
+                      setNotLoggedAlert(false);
+                    }, 2000);
+                  }
                 }}
               >
                 <svg
@@ -217,7 +239,7 @@ function Home({ colores, selActual, setSel }) {
               {llavesTakis.indexOf(selActual) === 3 ? takis['fuego'] : null}
             </Card>
           </Box>
-        </Center>
+        </Flex>
         <Center mt="4">
           <IconButton
             colorScheme={colores[selActual + 'button']}

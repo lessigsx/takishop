@@ -108,19 +108,21 @@ function Login({ colores, selActual, theme }) {
                       cookies.set(
                         'user',
                         {
+                          id: res.data.id,
                           name: res.data.name,
                           email: res.data.email,
                         },
                         {
                           path: '/',
-                          sameSite: 'strict',
+                          sameSite: 'none',
+                          secure: true,
                           expires: date,
                         }
                       );
                       navigate('/', { replace: true });
                     }
                   })
-                  .catch(() => {
+                  .catch((err) => {
                     setAuthFail(true);
                     setTimeout(() => {
                       setAuthFail(false);

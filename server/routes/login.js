@@ -14,6 +14,7 @@ router.post('/', function (req, res) {
       const query = User.findOne({ email: email, password: password });
       query.exec((err, user) => {
         if (err) {
+          res.status(500);
         } else {
           if (!user) {
             res.status(401).json({
@@ -21,6 +22,7 @@ router.post('/', function (req, res) {
             });
           } else {
             res.status(200).json({
+              id: user._id.toString(),
               name: user.name,
               email: user.email,
               authenticated: true,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Heading,
@@ -16,13 +16,31 @@ import { ChevronDownIcon } from '@chakra-ui/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
-function Navbar({ colores, selActual, user }) {
+function Navbar({ colores, selActual }) {
   const cookies = new Cookies();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const userCookie = cookies.get('user');
+
+  useEffect(() => {
+    if (userCookie) {
+      setUser({
+        name: userCookie.name,
+        email: userCookie.email,
+      });
+    } else {
+      setUser(null);
+    }
+  }, [userCookie]);
+
   return (
     <>
-      <Flex p="3">
-        <Box borderBottomRadius="sm" borderBottom="4px" borderColor="yellow.50">
+      <Flex p="3" flexDirection={{ base: 'column', sm: 'row' }}>
+        <Box
+          borderBottomRadius="sm"
+          borderBottom={{ base: '0px', sm: '4px' }}
+          borderColor="yellow.50"
+        >
           <Heading color="blackAlpha.900" size="md" mt="2">
             Takishop - tienda virtual
           </Heading>
@@ -30,7 +48,7 @@ function Navbar({ colores, selActual, user }) {
         <Spacer />
         <Box
           borderBottomRadius="sm"
-          borderBottom="4px"
+          borderBottom={{ base: '0px', sm: '4px' }}
           borderColor="yellow.50"
           paddingBottom="2px"
         >
@@ -48,6 +66,9 @@ function Navbar({ colores, selActual, user }) {
                 }}
                 _active={{
                   bg: colores[selActual],
+                }}
+                onClick={() => {
+                  navigate('/', { replace: true });
                 }}
               >
                 <Link to="/">Inicio</Link>
@@ -71,7 +92,7 @@ function Navbar({ colores, selActual, user }) {
                     bg: colores[selActual],
                   }}
                 >
-                  Cuenta
+                  {user ? <p>Cuenta ({user['name']})</p> : <p>Cuenta</p>}
                 </MenuButton>
                 {user ? (
                   <MenuList m="0" p="1">
